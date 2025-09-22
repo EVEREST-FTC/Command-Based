@@ -25,4 +25,9 @@ public class Alinhar extends Command {
     public void execute() {
         Pid.calculate(chassis.get_yaw(),alvo);
     }
+
+    @Override
+    public void end(boolean interrupted) {
+        chassis.drive(0, 0, 0);
+    }
 }

@@ -6,6 +6,8 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.ufpackages.CommandBased.CommandScheduler;
 import org.firstinspires.ftc.teamcode.ufpackages.CommandBased.SubsystemBase;
 
 public class Chassi extends SubsystemBase {
@@ -13,8 +15,9 @@ public class Chassi extends SubsystemBase {
     IMU imu;
 
     Limelight3A limelight3A;
+    Telemetry telemetry;
 
-    public Chassi(HardwareMap hardwareMap){
+    public Chassi(HardwareMap hardwareMap, Telemetry telemetry){
         MFL = hardwareMap.get(DcMotor.class,"MFL");
         MFR = hardwareMap.get(DcMotor.class,"MFR");
         MBL = hardwareMap.get(DcMotor.class,"MBL");
@@ -23,8 +26,11 @@ public class Chassi extends SubsystemBase {
         MBL.setDirection(DcMotorSimple.Direction.REVERSE);
         imu = hardwareMap.get(IMU.class, "imu");
         limelight3A = hardwareMap.get(Limelight3A.class,"limelight3A");
-        limelight3A.start();
 
+        this.telemetry = telemetry;
+        telemetry.setMsTransmissionInterval(11);
+        limelight3A.start();
+        CommandScheduler.getInstance().registerSubsystem(this);
     }
     public void drive(double x, double y, double z){
         double frontLeftPower = x+y+z;
@@ -36,6 +42,12 @@ public class Chassi extends SubsystemBase {
         MBL.setPower(backLeftPower);
         MBR.setPower(backRightPower);
     }
+
+    @Override
+    public void periodic() {
+        telemetry.addData("isValid", isvalid());
+    }
+
     public double get_yaw(){
         return imu.getRobotYawPitchRollAngles().getYaw();
     }

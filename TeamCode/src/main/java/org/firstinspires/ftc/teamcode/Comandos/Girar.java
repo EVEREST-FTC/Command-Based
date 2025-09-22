@@ -24,4 +24,9 @@ public class Girar extends Command {
 
         chassis.drive(0, 0, z);
     }
+
+    @Override
+    public void end(boolean interrupted) {
+        chassis.drive(0, 0, 0);
+    }
 }

@@ -6,15 +6,15 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.robot.Robot;
 
+import org.firstinspires.ftc.teamcode.RobotConteiner.Hunttag;
 import org.firstinspires.ftc.teamcode.ufpackages.CommandBased.CommandScheduler;
 @TeleOp(name = "main")
 public class Main extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        new RobotContainer(telemetry,
-                hardwareMap,
-                gamepad1);
+        new Hunttag (
+                gamepad1,hardwareMap, telemetry);
         waitForStart();
         while (opModeIsActive()) {
             CommandScheduler.getInstance().run(this);

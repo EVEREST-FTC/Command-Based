@@ -3,9 +3,6 @@ package org.firstinspires.ftc.teamcode;
 
 
 public class PID {
-
-
-
     private final double kp;
     private double error;
 
