@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.Comandos.Dirigir;
 import org.firstinspires.ftc.teamcode.Comandos.Girar;
 import org.firstinspires.ftc.teamcode.PID;
 import org.firstinspires.ftc.teamcode.SubSistemas.Chassi;
@@ -23,17 +24,22 @@ public class Hunttag {
         this.chassis = new Chassi(hardwareMap, telemetry);
         this.Pid = new PID(0.01);
         this.gamepad = gamepad;
-        hunt();
+        mover();
     }
     private void hunt(){
         new Trigger(()->gamepad.b).toggleOnTrue(
                 new Girar(chassis, 0.3)
         );
-        new Trigger(()-> gamepad.a).toggleOnTrue(
+        /*new Trigger(()-> gamepad.a).toggleOnTrue(
                 new RepeatCommand(
                         new Girar(chassis,0.3)
                 ).ateQUe(chassis::isvalid)
-        );
+        );*/
 
+    }
+    private  void mover(){
+        chassis.setDefaultCommand(
+                new Dirigir(chassis,()->-gamepad.right_stick_x*0.7,()->gamepad.left_stick_y*0.7,()->-gamepad.left_stick_x*0.7)
+        );
     }
 }

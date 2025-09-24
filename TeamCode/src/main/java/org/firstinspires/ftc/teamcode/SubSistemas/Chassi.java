@@ -14,7 +14,7 @@ public class Chassi extends SubsystemBase {
     DcMotor MFR,MFL,MBR,MBL;
     IMU imu;
 
-    Limelight3A limelight3A;
+    /*Limelight3A limelight3A;*/
     Telemetry telemetry;
 
     public Chassi(HardwareMap hardwareMap, Telemetry telemetry){
@@ -25,11 +25,15 @@ public class Chassi extends SubsystemBase {
         MFL.setDirection(DcMotorSimple.Direction.REVERSE);
         MBL.setDirection(DcMotorSimple.Direction.REVERSE);
         imu = hardwareMap.get(IMU.class, "imu");
-        limelight3A = hardwareMap.get(Limelight3A.class,"limelight3A");
+        MFR.setMode(DcMotor.RunMode.RESET_ENCODERS);
+        MBL.setMode(DcMotor.RunMode.RESET_ENCODERS);
+        MFR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        MBL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        /*limelight3A = hardwareMap.get(Limelight3A.class,"limelight3A");*/
 
         this.telemetry = telemetry;
         telemetry.setMsTransmissionInterval(11);
-        limelight3A.start();
+        /*limelight3A.start();*/
         CommandScheduler.getInstance().registerSubsystem(this);
     }
     public void drive(double x, double y, double z){
@@ -43,15 +47,23 @@ public class Chassi extends SubsystemBase {
         MBR.setPower(backRightPower);
     }
 
-    @Override
+   /* @Override
     public void periodic() {
         telemetry.addData("isValid", isvalid());
     }
+*/
+    public void brake(){
+        MFR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        MFL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        MBR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        MBL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+
+    }
     public double get_yaw(){
         return imu.getRobotYawPitchRollAngles().getYaw();
     }
-    public  double get_tx(){
+    /*public  double get_tx(){
         return limelight3A.getLatestResult().getTx();
     }
     public  double get_ty(){
@@ -59,8 +71,13 @@ public class Chassi extends SubsystemBase {
     }
     public boolean isvalid(){
         return limelight3A.getLatestResult().isValid();
-    }
+    }*/
 
+    @Override
+    public void periodic() {
+        telemetry.addData("odometria 1",MFR.getCurrentPosition());
+        telemetry.addData("odometria 2",MBL.getCurrentPosition());
+    }
 
     public void stop(){
         drive(0.0, 0.0, 0.0);
