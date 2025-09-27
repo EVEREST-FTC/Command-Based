@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.tuning;
+package org.firstinspires.ftc.teamcode.rrres.tuning;
 
 import androidx.annotation.NonNull;
 
@@ -40,12 +40,12 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
 import org.firstinspires.ftc.robotcore.internal.opmode.OpModeMeta;
-import org.firstinspires.ftc.teamcode.MecanumDrive;
-import org.firstinspires.ftc.teamcode.OTOSLocalizer;
-import org.firstinspires.ftc.teamcode.PinpointLocalizer;
-import org.firstinspires.ftc.teamcode.TankDrive;
-import org.firstinspires.ftc.teamcode.ThreeDeadWheelLocalizer;
-import org.firstinspires.ftc.teamcode.TwoDeadWheelLocalizer;
+import org.firstinspires.ftc.teamcode.SubSistemas.MecanumDrive;
+import org.firstinspires.ftc.teamcode.rrres.util.OTOSLocalizer;
+import org.firstinspires.ftc.teamcode.rrres.util.PinpointLocalizer;
+import org.firstinspires.ftc.teamcode.rrres.util.TankDrive;
+import org.firstinspires.ftc.teamcode.rrres.util.ThreeDeadWheelLocalizer;
+import org.firstinspires.ftc.teamcode.rrres.util.TwoDeadWheelLocalizer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -70,6 +70,11 @@ public final class TuningOpModes {
 
     private static PinpointView makePinpointView(PinpointLocalizer pl) {
         return new PinpointView() {
+            @Override
+            public float getHeadingVelocity() {
+                return (float) pl.driver.getHeadingVelocity(UnnormalizedAngleUnit.DEGREES);
+            }
+
             GoBildaPinpointDriver.EncoderDirection parDirection = pl.initialParDirection;
             GoBildaPinpointDriver.EncoderDirection perpDirection = pl.initialPerpDirection;
 
@@ -88,10 +93,6 @@ public final class TuningOpModes {
                 return pl.driver.getEncoderY();
             }
 
-            @Override
-            public float getHeadingVelocity(UnnormalizedAngleUnit unit) {
-                return (float) pl.driver.getHeadingVelocity(unit);
-            }
 
             @Override
             public void setParDirection(@NonNull DcMotorSimple.Direction direction) {

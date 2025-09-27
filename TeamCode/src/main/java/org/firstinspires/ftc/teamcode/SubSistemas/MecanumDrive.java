@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.SubSistemas;
 
 import androidx.annotation.NonNull;
 
@@ -39,12 +39,19 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
-import org.firstinspires.ftc.teamcode.messages.DriveCommandMessage;
-import org.firstinspires.ftc.teamcode.messages.MecanumCommandMessage;
-import org.firstinspires.ftc.teamcode.messages.MecanumLocalizerInputsMessage;
-import org.firstinspires.ftc.teamcode.messages.PoseMessage;
+import org.firstinspires.ftc.teamcode.rrres.messages.DriveCommandMessage;
+import org.firstinspires.ftc.teamcode.rrres.messages.MecanumCommandMessage;
+import org.firstinspires.ftc.teamcode.rrres.messages.MecanumLocalizerInputsMessage;
+import org.firstinspires.ftc.teamcode.rrres.messages.PoseMessage;
+import org.firstinspires.ftc.teamcode.rrres.util.ThreeDeadWheelLocalizer;
+import org.firstinspires.ftc.teamcode.ufpackages.CommandBased.CommandScheduler;
+import org.firstinspires.ftc.teamcode.ufpackages.CommandBased.SubsystemBase;
+import org.firstinspires.ftc.teamcode.rrres.util.Drawing;
+import org.firstinspires.ftc.teamcode.rrres.util.Localizer;
+import org.firstinspires.ftc.teamcode.rrres.util.TwoDeadWheelLocalizer;
 
 import java.lang.Math;
 import java.util.Arrays;
@@ -52,7 +59,16 @@ import java.util.LinkedList;
 import java.util.List;
 
 @Config
-public final class MecanumDrive {
+public final class MecanumDrive extends SubsystemBase {
+    Telemetry telemetry;
+
+    @Override
+    public void periodic() {
+        telemetry.addData("odometria 1",rightFront.getCurrentPosition());
+        telemetry.addData("odometria 2",leftBack.getCurrentPosition());
+        telemetry.addData("odometria 3", rightBack.getCurrentPosition());
+    }
+
     public static class Params {
         // IMU orientation
         // TODO: fill in these values based on
@@ -63,14 +79,14 @@ public final class MecanumDrive {
                 RevHubOrientationOnRobot.UsbFacingDirection.RIGHT;
 
         // drive model parameters
-        public double inPerTick = 1;
-        public double lateralInPerTick = inPerTick;
-        public double trackWidthTicks = 0;
+        public double inPerTick = 40/13637.0;
+        public double lateralInPerTick = 0.0021445516343825835;
+        public double trackWidthTicks =  4162.99585799652;
 
         // feedforward parameters (in tick units)
-        public double kS = 0;
-        public double kV = 0;
-        public double kA = 0;
+        public double kS = 0.6461603100227205;
+        public double kV = 0.00038969915971060745;
+        public double kA = 0.000055;
 
         // path profile parameters (in inches)
         public double maxWheelVel = 50;
@@ -216,7 +232,11 @@ public final class MecanumDrive {
         }
     }
 
-    public MecanumDrive(HardwareMap hardwareMap, Pose2d pose) {
+    public MecanumDrive(HardwareMap hardwareMap, Pose2d pose){
+        this(hardwareMap, pose, null);
+    }
+    public MecanumDrive(HardwareMap hardwareMap, Pose2d pose, Telemetry telemetry) {
+        this.telemetry = telemetry;
         LynxFirmware.throwIfModulesAreOutdated(hardwareMap);
 
         for (LynxModule module : hardwareMap.getAll(LynxModule.class)) {
@@ -230,6 +250,7 @@ public final class MecanumDrive {
         rightBack = hardwareMap.get(DcMotorEx.class, "MBR");
         rightFront = hardwareMap.get(DcMotorEx.class, "MFR");
 
+
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -237,7 +258,8 @@ public final class MecanumDrive {
 
         // TODO: reverse motor directions if needed
         //   leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
-
+        rightBack.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
         // TODO: make sure your config has an IMU with this name (can be BNO or BHI)
         //   see https://ftc-docs.firstinspires.org/en/latest/hardware_and_software_configuration/configuring/index.html
         lazyImu = new LazyHardwareMapImu(hardwareMap, "imu", new RevHubOrientationOnRobot(
@@ -245,9 +267,10 @@ public final class MecanumDrive {
 
         voltageSensor = hardwareMap.voltageSensor.iterator().next();
 
-        localizer = new DriveLocalizer(pose);
+        localizer = new ThreeDeadWheelLocalizer(hardwareMap, PARAMS.inPerTick, pose);
 
         FlightRecorder.write("MECANUM_PARAMS", PARAMS);
+        CommandScheduler.getInstance().registerSubsystem(this);
     }
 
     public void setDrivePowers(PoseVelocity2d powers) {
@@ -493,5 +516,11 @@ public final class MecanumDrive {
                 defaultTurnConstraints,
                 defaultVelConstraint, defaultAccelConstraint
         );
+    }
+    public void brake(){
+        leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 }
