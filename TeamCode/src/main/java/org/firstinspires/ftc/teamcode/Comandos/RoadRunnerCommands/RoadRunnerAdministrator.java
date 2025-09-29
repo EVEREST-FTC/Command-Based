@@ -26,7 +26,7 @@ public abstract class RoadRunnerAdministrator extends org.firstinspires.ftc.team
      */
     //prefiro usar o optional do que arriscar o
     //NullPointerException (anulamos a instância no final do comando),
-    protected Optional<TrajectoryActionBuilder> instance = Optional.empty();
+        protected TrajectoryActionBuilder instance = null;
     private final TelemetryPacket telemetryPacket = new TelemetryPacket();
     private final MecanumDrive mecanumDrive;
     private boolean inTrajectory = false;
@@ -51,7 +51,7 @@ public abstract class RoadRunnerAdministrator extends org.firstinspires.ftc.team
     @Override
     protected void initialize() {
         inTrajectory = true;
-        instance = Optional.of(getBase());
+        instance = getBase();
     }
 
     /**
@@ -86,8 +86,8 @@ public abstract class RoadRunnerAdministrator extends org.firstinspires.ftc.team
 
     @Override
     public void execute() {
-        //TelemetryPacket telemetryPacket = new TelemetryPacket();
-        inTrajectory = instance.get().build().run(telemetryPacket);
+        TelemetryPacket telemetryPacket = new TelemetryPacket();
+        inTrajectory = instance.build().run(telemetryPacket);
     }
 
     /**
@@ -95,7 +95,7 @@ public abstract class RoadRunnerAdministrator extends org.firstinspires.ftc.team
      */
     @Override
     public void end(boolean interrupted) {
-        instance = Optional.empty();
+        instance = null;
         mecanumDrive.setDrivePowers(new PoseVelocity2d(new Vector2d(0.0, 0.0), 0.0));
     }
 
@@ -116,16 +116,24 @@ public abstract class RoadRunnerAdministrator extends org.firstinspires.ftc.team
      */
     protected TrajectoryActionBuilder getBase() {
         return mecanumDrive.actionBuilder(mecanumDrive.localizer.getPose());
-
     }
 
     public static class RoadRunnerFactory{
-        RoadRunnerAdministrator lineToX(MecanumDrive mecanumDrive, double x) {
+        public static RoadRunnerAdministrator lineToX(MecanumDrive mecanumDrive, double x) {
             return new RoadRunnerAdministrator(mecanumDrive) {
                 @Override
                 protected void initialize() {
                     super.initialize();
-                    instance = Optional.of(instance.get().lineToX(x));
+                    instance = instance.lineToX(x);
+                }
+            };
+        }
+        public static RoadRunnerAdministrator StrafeToLinearHeading(MecanumDrive mecanumDrive, Vector2d vector2d, double angulo){
+            return new RoadRunnerAdministrator(mecanumDrive) {
+                @Override
+                protected void initialize() {
+                    super.initialize();
+                    instance = instance.strafeToLinearHeading(vector2d, angulo);
                 }
             };
         }
@@ -134,7 +142,7 @@ public abstract class RoadRunnerAdministrator extends org.firstinspires.ftc.team
                 @Override
                 protected void initialize() {
                     super.initialize();
-                    instance = Optional.of(instance.get().lineToY(y));
+                    instance = instance.lineToY(y);
                 }
             };
         }
@@ -143,7 +151,7 @@ public abstract class RoadRunnerAdministrator extends org.firstinspires.ftc.team
                 @Override
                 protected void initialize() {
                     super.initialize();
-                    instance = Optional.of(instance.get().splineToLinearHeading(pose, tangent));
+                    instance = instance.splineToLinearHeading(pose, tangent);
                 }
             };
         }
