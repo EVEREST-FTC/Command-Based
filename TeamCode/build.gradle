@@ -34,6 +34,7 @@ dependencies {
 
     implementation "com.acmerobotics.dashboard:dashboard:0.4.17"
 
+    implementation "com.googlecode.json-simple:json-simple:1.1.1"
 }
 repositories {
 

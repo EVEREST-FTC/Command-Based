@@ -14,13 +14,16 @@ public class Main extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        new auto1(
+        auto1 rcAuto = new auto1(
                 gamepad1,hardwareMap, telemetry);
         waitForStart();
         while (opModeIsActive()) {
             CommandScheduler.getInstance().run(this);
+            if (gamepad1.a)
+                CommandScheduler.getInstance().m_scheduledCommands.clear();
             telemetry.update();
         }
         CommandScheduler.getInstance().m_scheduledCommands.clear();
+        rcAuto.publish();
     }
 }

@@ -62,8 +62,14 @@ import java.util.List;
 public final class MecanumDrive extends SubsystemBase {
     Telemetry telemetry;
 
+
+    public void setPose(Pose2d pose) {
+        this.localizer.setPose(pose);
+    }
     @Override
     public void periodic() {
+        updatePoseEstimate();
+
         telemetry.addData("odometria 1",rightFront.getCurrentPosition());
         telemetry.addData("odometria 2",leftBack.getCurrentPosition());
         telemetry.addData("odometria 3", rightBack.getCurrentPosition());
@@ -93,8 +99,8 @@ public final class MecanumDrive extends SubsystemBase {
        /* public double maxWheelVel = 50;
         public double minProfileAccel = -30;
         public double maxProfileAccel = 50;*/
-        public double maxWheelVel = 20;
-        public double minProfileAccel = -20;
+        public double maxWheelVel = 55;
+        public double minProfileAccel = -15;
         public double maxProfileAccel = 20;
 
         // turn profile parameters (in radians)

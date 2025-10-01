@@ -11,6 +11,15 @@ public abstract class Command implements Sendable {
     protected Command(){
     }
     protected void initialize(){}
+    public WrapperCommand finalmente(Runnable acao){
+        return new WrapperCommand(this){
+            @Override
+            public void end(boolean interrupted) {
+                super.end(interrupted);
+                acao.run();
+            }
+        };
+    }
     public void execute(){}
     public void end(boolean interrupted){}
     protected boolean isFinished(){ return false; }
@@ -54,6 +63,13 @@ public abstract class Command implements Sendable {
     public SequentialCommandGroup antesDe(Command before) {
         return new SequentialCommandGroup(before, this);
     }
+   /* public Command onEnd(Runnable action){
+        return this
+    }*/
+    public SequentialCommandGroup depois(Command after){
+        return new SequentialCommandGroup(this,after);
+    }
+
     public boolean runsWhenDisabled(){ return false; }
     public enum InterruptBehavior{
         cancelSelf,

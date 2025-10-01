@@ -30,7 +30,10 @@ public class StrafeTo extends Command {
                 mecanumDrive.localizer.getPose());
         action = trajectoryActionBuilder.strafeTo(vector2d).build();
     }
-
+    @Override
+    public void end(boolean interrupted) {
+        mecanumDrive.setDrivePowers(new PoseVelocity2d(new Vector2d(0.0, 0.0), 0.0));
+    }
     @Override
     public void execute() {
         inTrajectory = action.run(new TelemetryPacket());
