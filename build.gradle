@@ -14,4 +14,8 @@ buildscript {
         // Note for FTC Teams: Do not modify this yourself.
         classpath 'com.android.tools.build:gradle:8.7.0'
     }
+
+}
+plugins {
+    id 'maven-publish'
 }
