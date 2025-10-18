@@ -1,29 +1,32 @@
 package org.firstinspires.ftc.teamcode.SubSistemas;
 
-import com.qualcomm.hardware.limelightvision.Limelight3A;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
-import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.Constantes;
+import org.firstinspires.ftc.teamcode.ufpackages.CommandBased.Command;
 import org.firstinspires.ftc.teamcode.ufpackages.CommandBased.CommandScheduler;
 import org.firstinspires.ftc.teamcode.ufpackages.CommandBased.SubsystemBase;
+
 @Deprecated
 public class Chassi extends SubsystemBase {
-    DcMotor MFR,MFL,MBR,MBL;
+    DcMotorEx MFR,MFL,MBR,MBL;
     IMU imu;
 
-    /*Limelight3A limelight3A;*/
+    private double Utimate = 0;
+
+
     Telemetry telemetry;
 
     public Chassi(HardwareMap hardwareMap, Telemetry telemetry){
-        MFL = hardwareMap.get(DcMotor.class,"MFL");
-        MFR = hardwareMap.get(DcMotor.class,"MFR");
-        MBL = hardwareMap.get(DcMotor.class,"MBL");
-        MBR = hardwareMap.get(DcMotor.class,"MBR");
+        MFL = hardwareMap.get(DcMotorEx.class,"MFL");
+        MFR = hardwareMap.get(DcMotorEx.class,"MFR");
+        MBL = hardwareMap.get(DcMotorEx.class,"MBL");
+        MBR = hardwareMap.get(DcMotorEx.class,"MBR");
         MFL.setDirection(DcMotorSimple.Direction.REVERSE);
         MBL.setDirection(DcMotorSimple.Direction.REVERSE);
         imu = hardwareMap.get(IMU.class, "imu");
@@ -31,11 +34,11 @@ public class Chassi extends SubsystemBase {
         MBL.setMode(DcMotor.RunMode.RESET_ENCODERS);
         MFR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         MBL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        /*limelight3A = hardwareMap.get(Limelight3A.class,"limelight3A");*/
+
 
         this.telemetry = telemetry;
         telemetry.setMsTransmissionInterval(11);
-        /*limelight3A.start();*/
+
         CommandScheduler.getInstance().registerSubsystem(this);
     }
     public void drive(double x, double y, double z){
@@ -45,15 +48,23 @@ public class Chassi extends SubsystemBase {
         double backRightPower = x+y-z;
         MFL.setPower(frontLeftPower);
         MFR.setPower(frontRightPower);
-        MBL.setPower(backLeftPower);
-        MBR.setPower(backRightPower);
+        /*MBL.setPower(backLeftPower);*/
+        /*MBR.setPower(backRightPower);*/
+    }
+    public void setVelocity(double velocity){
+        /*velocity = (velocity*Constantes.taxadeconverçãoouttake)/60;*/
+        MFR.setPower(velocity);
+        MFL.setPower(velocity);
+
+    }
+    public void ResetEncoder(){
+        MFR.setMode(DcMotor.RunMode.RESET_ENCODERS);
+        MFL.setMode(DcMotor.RunMode.RESET_ENCODERS);
+        MFR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        MFL.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
     }
 
-   /* @Override
-    public void periodic() {
-        telemetry.addData("isValid", isvalid());
-    }
-*/
     public void brake(){
         MFR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         MFL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -62,23 +73,19 @@ public class Chassi extends SubsystemBase {
 
 
     }
-    public double get_yaw(){
-        return imu.getRobotYawPitchRollAngles().getYaw();
-    }
-    /*public  double get_tx(){
-        return limelight3A.getLatestResult().getTx();
-    }
-    public  double get_ty(){
-        return limelight3A.getLatestResult().getTy();
-    }
-    public boolean isvalid(){
-        return limelight3A.getLatestResult().isValid();
-    }*/
-
     @Override
     public void periodic() {
-        telemetry.addData("odometria 1",MFR.getCurrentPosition());
-        telemetry.addData("odometria 2",MBL.getCurrentPosition());
+        telemetry.addData("velocidadeL", (MFL.getVelocity()/Constantes.taxadeconverçãoouttake)*60);
+        telemetry.addData("velocidadeF", (MFR.getVelocity()/Constantes.taxadeconverçãoouttake)*60);
+        telemetry.addData("positionL",MFL.getCurrentPosition()/ Constantes.taxadeconvercao1);
+        telemetry.addData("positionR",MFR.getCurrentPosition()/Constantes.taxadeconvercao1);
+        telemetry.addData("tempo",Utimate);
+
+
+    }
+
+    public void setUtimate(double utimate) {
+        Utimate = utimate;
     }
 
     public void stop(){

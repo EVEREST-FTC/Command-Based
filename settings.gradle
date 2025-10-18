@@ -1,2 +1,17 @@
 include ':FtcRobotController'
 include ':TeamCode'
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        maven {
+            url = 'https://maven.brott.dev/'
+        }
+        maven {
+            name = "GitHubPackagesP1Demo"
+            url = 'https://maven.pkg.github.com/angelorrrr/P1Demo'
+        }
+    }
+}
+// ... restante do código settings.gradle
