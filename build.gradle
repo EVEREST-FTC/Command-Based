@@ -24,7 +24,7 @@ publishing {
         maven(MavenPublication) {
             groupId = 'com.github.EVEREST-FTC'
             artifactId = 'CommandBased'
-            version = '1.1.1'
+            version = '1.1.2'
 
             afterEvaluate {
                 if (project.tasks.findByName('bundleReleaseAar')) {
