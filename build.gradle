@@ -19,3 +19,18 @@ buildscript {
 plugins {
     id 'maven-publish'
 }
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = 'com.github.EVEREST-FTC'
+            artifactId = 'CommandBased'
+            version = '1.2'
+
+            afterEvaluate {
+                if (project.tasks.findByName('bundleReleaseAar')) {
+                    artifact(tasks.getByName('bundleReleaseAar'))
+                }
+            }
+        }
+    }
+}
