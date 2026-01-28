@@ -69,6 +69,30 @@ public final class CommandScheduler{
     private final List<Optional<Command>> m_toCancelInterruptors = new ArrayList<>();
     private final Set<Command> m_endingCommands = new LinkedHashSet<>();
 
+    public void reset() {
+        cancelAll();
+
+        m_scheduledCommands.clear();
+        m_requirements.clear();
+        m_subsystems.clear();
+
+        m_toSchedule.clear();
+        m_toCancelCommands.clear();
+        m_toCancelInterruptors.clear();
+        m_endingCommands.clear();
+
+        m_composedCommands.clear();
+
+        m_initActions.clear();
+        m_executeActions.clear();
+        m_interruptActions.clear();
+        m_finishActions.clear();
+
+        m_activeButtonLoop = m_defaultButtonLoop;
+        m_disabled = false;
+        m_inRunLoop = false;
+        unregisterAllSubsystems();
+    }
 
     CommandScheduler() {}
 
